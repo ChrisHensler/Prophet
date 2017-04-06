@@ -1,6 +1,9 @@
 import os
 import re
 
+APP_ROOT = '.'
+VERBOSE = False
+
 def parseGrepable(scan_results_file):
 	#parse nmap grepable output
 	print "ANALYZING GREPABLE_______________"
@@ -11,28 +14,28 @@ def parseGrepable(scan_results_file):
 	for line in f:
 		#register new host
 		if('Up' in line): 
-			host = '../out/' + line.split(' ')[1]
+			host = APP_ROOT + '/out/' + line.split(' ')[1]
 			if not os.path.exists(host):
 				os.makedirs(host)
 		#register ports			
 		if('/open/' in line):
-			print "PARSING: " + line
-			host = '../out/' + line.split(' ')[1]
-			print host
+			#print "PARSING: " + line
+			host = APP_ROOT + '/out/' + line.split(' ')[1]
+			#print host
 			if not os.path.exists(host):
 				os.makedirs(host)
 
 			#parse ports
 			port_section = line[line.index("Ports: ") + 7:]
 			for portstring in port_section.split(','):
-				print "portline: " + portstring
+				#print "portline: " + portstring
 				portinfo = portstring.split('/')
 				if(portinfo[1] == "open"):					
 					portpath = host + "/" + portinfo[2].strip() + "-" + portinfo[0].strip()
 					if(len(portinfo) > 3):
 						portpath = portpath + "-" + portinfo[4].strip()
 
-					print "resolved: " + portpath
+					#print "resolved: " + portpath
 
 					if not os.path.exists(portpath):
 						os.makedirs(portpath)
@@ -57,7 +60,7 @@ def parseOSScan(scan_results_file):
 				#write old file
 				if(host != ""):
 					print "Writing host"
-					sysdir = "../out/"+host+"/system_info/"
+					sysdir = APP_ROOT + "/out/"+host+"/system_info/"
 					if not os.path.exists(sysdir):
 						os.makedirs(sysdir)
 					with open(sysdir + "os_scan.results.txt", 'w') as hostfile:
@@ -92,11 +95,11 @@ def parseHost(line):
 	return ip
 
 def parseAll():
-	for item in os.listdir("../tmp"):
+	for item in os.listdir(APP_ROOT + "/tmp"):
 		if item.endswith(".OS"):
-			parseOSScan("../tmp/" +item)
+			parseOSScan(APP_ROOT + "/tmp/" +item)
 		else:
-			parseGrepable("../tmp/" +item)
+			parseGrepable(APP_ROOT + "/tmp/" +item)
 				
 
 def compileDependants():
@@ -104,11 +107,11 @@ def compileDependants():
 	print "COMPILING " + iplist_loc
 
 	ip_list_content = ""
-	for item in os.listdir("../out"): 
+	for item in os.listdir(APP_ROOT + "/out"): 
 		if isIp(item): #only IP addresses expected
 			ip_list_content = ip_list_content + item + "\n"
-		else:
-			print "FOUND ATTEMPTED NON-IP IN ip_list"
+		elif(item != "ip_list"):
+			print "FOUND ATTEMPTED NON-IP IN ip_list: " + item
 		
 	ip_list_content = ip_list_content
 	with open(iplist_loc,"w") as f:
@@ -116,5 +119,5 @@ def compileDependants():
 		f.write(ip_list_content)
 
 def get_iplist_location():
-	return "../out/ip_list"
+	return APP_ROOT + "/out/ip_list"
 
