@@ -6,4 +6,4 @@ discovery_quick_port: -Pn -sS --top-ports 10
 
 service:  -A -sV -Pn -sTU --top-ports 1000  --script=default,banner-plus.nse,smb-enum-shares,http-enum,oracle-sid-brute,realvnc-auth-bypass,smtp-enum-users
  
-haystack: -Pn -sTU -p 1-65535 --script=banner-plus.nse
+haystack: -Pn -sT -p 1-65535 --script=default,banner-plus.nse

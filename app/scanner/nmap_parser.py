@@ -6,47 +6,43 @@ VERBOSE = False
 
 def parseGrepable(scan_results_file):
 	#parse nmap grepable output
-	print "ANALYZING GREPABLE_______________"
-	print scan_results_file
-	print "_______________________"
+	print "ANALYZING GREPABLE: " + scan_results_file
 
-	f = open(scan_results_file, 'r')
-	for line in f:
-		#register new host
-		if('Up' in line): 
-			host = APP_ROOT + '/out/' + line.split(' ')[1]
-			if not os.path.exists(host):
-				os.makedirs(host)
-		#register ports			
-		if('/open/' in line):
-			#print "PARSING: " + line
-			host = APP_ROOT + '/out/' + line.split(' ')[1]
-			#print host
-			if not os.path.exists(host):
-				os.makedirs(host)
+	with open(scan_results_file, 'r') as f:
+		for line in f:
+			#register new host
+			if('Up' in line): 
+				host = APP_ROOT + '/out/' + line.split(' ')[1]
+				if not os.path.exists(host):
+					os.makedirs(host)
+			#register ports			
+			if('/open/' in line):
+				#print "PARSING: " + line
+				host = APP_ROOT + '/out/' + line.split(' ')[1]
+				#print host
+				if not os.path.exists(host):
+					os.makedirs(host)
 
-			#parse ports
-			port_section = line[line.index("Ports: ") + 7:]
-			for portstring in port_section.split(','):
-				#print "portline: " + portstring
-				portinfo = portstring.split('/')
-				if(portinfo[1] == "open"):					
-					portpath = host + "/" + portinfo[2].strip() + "-" + portinfo[0].strip()
-					if(len(portinfo) > 3):
-						portpath = portpath + "-" + portinfo[4].strip()
+				#parse ports
+				port_section = line[line.index("Ports: ") + 7:]
+				for portstring in port_section.split(','):
+					#print "portline: " + portstring
+					portinfo = portstring.split('/')
+					if(portinfo[1] == "open"):					
+						portpath = host + "/" + portinfo[2].strip() + "-" + portinfo[0].strip()
+						if(len(portinfo) > 3):
+							portpath = portpath + "-" + portinfo[4].strip()
 
-					#print "resolved: " + portpath
+						#print "resolved: " + portpath
 
-					if not os.path.exists(portpath):
-						os.makedirs(portpath)
-
-	f.close()
+						if not os.path.exists(portpath):
+							os.makedirs(portpath)
 	compileDependants()
+	print 'done'
+	print "_______________________"
 
 def parseOSScan(scan_results_file):
-	print "ANALYZING OS SCAN_______________"
-	print scan_results_file
-	print "_______________________"
+	print "ANALYZING OS SCAN:" + scan_results_file
 
 	#context variables
 	host = ""
@@ -75,6 +71,8 @@ def parseOSScan(scan_results_file):
 				scan_results = scan_results + line + "\n" 
 
 	compileDependants()
+	print 'done'
+	print "_______________________"
 
 
 def isIp(s):
