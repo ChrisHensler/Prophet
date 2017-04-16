@@ -3,11 +3,10 @@ import subprocess
 import os
 import nmap_parser
 import nmap_xml_parser
-import fileutil
-
+import web_scanner
+from app.util import fileutil
 
 APP_ROOT = '.'
-
 
 def Run(name, flags, ip_list):
 
@@ -25,7 +24,7 @@ def Run(name, flags, ip_list):
 
 
 def RunAll(ip_list = '-iL ' + fileutil.getConfigPath() + 'ip_list'):
-	print "scanning range" + ip_list
+	print "SCANNING RANGE: " + ip_list
 
 	#get scan profiles
 	with open(fileutil.getConfigPath() + 'scan_profiles', 'r') as scan_file:
@@ -35,6 +34,8 @@ def RunAll(ip_list = '-iL ' + fileutil.getConfigPath() + 'ip_list'):
 				#run scan
 				profile = scan.rstrip('\n').split(':')
 				Run(profile[0],profile[1],ip_list)
+
+	web_scanner.ScanAll()
 
 	
 def ParseScan(scan):

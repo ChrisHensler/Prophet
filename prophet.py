@@ -1,5 +1,7 @@
+#!/usr/bin/env python
+
 import app.scanner.scan_controller as scan_controller
-import fileinput
+from app.util import clean
 
 living = True
 while living:
@@ -11,6 +13,8 @@ while living:
 		scan_controller.ParseScan(cmd.split(' ')[1])
 	elif(cmd.lower() == "exit" or cmd.lower() == "quit"):
 		living = False
+	elif(cmd.lower() == "clean"):
+		clean.clean()
 	else:
 		print("Valid commands are:")
 		print("Scan: runs scan")

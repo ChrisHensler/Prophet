@@ -1,6 +1,8 @@
+#!/usr/bin/env python
+
 import xml.etree.ElementTree as ET
-import fileutil
 import json
+from app.util import fileutil
 
 VERBOSE = False
 
@@ -42,7 +44,16 @@ def makePortDirs(host, hostpath):
 				aggServiceInfo(portpath, service)
 
 				storeScriptResults(port, portpath);
+	#parse host level things
+	host_info_string = "OS Guesses:\n"
+	for osmatch in host.iter('osmatch'):
+		host_info_string = host_info_string + osmatch.get("accuracy") + "%: " + osmatch.get("name") + "\n"
 
+	uptime = host.find("uptime")
+	host_info_string = host_info_string + "\n\nUptime: " + uptime.get("seconds") + "s Last boot: " + uptime.get("lastboot") + "\n"
+
+
+	fileutil.writeTo(hostpath + 'system_info.txt', host_info_string)
 
 def aggServiceInfo(servicepath, serviceNode):
 	if(not servicepath.endswith('/')):
@@ -66,5 +77,5 @@ def storeScriptResults(xmlContext, path):
 		path = path + '/'
 
 	for script in xmlContext.findall('script'):
-		fileutil.writeXMLTo(path + script.get('id') + '.xml',script)
-
+		#fileutil.writeXMLTo(path + script.get('id') + '.scan.xml',script)
+		fileutil.writeTo(path + script.get('id') + '.scan.txt',str(script.get('output')))

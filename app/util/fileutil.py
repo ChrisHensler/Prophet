@@ -3,15 +3,27 @@ import xml.etree.ElementTree as ET
 import json
 import xml.dom.minidom as minidom
 
+
+
+
+
+def ensurePathSlash(path):
+	if not path.endswith('/'):
+		path = path + '/'
+	return path
+
 root = os.getcwd();
 def getRootPath():
-	return root
+	return ensurePathSlash(root)
 def getOutPath():
-	return getRootPath() + '/out/'
+	return ensurePathSlash(os.path.join(getRootPath(),'out'))
 def getTmpPath():
-	return getRootPath() + '/tmp/'
+	return ensurePathSlash(os.path.join(getRootPath(), 'tmp'))
 def getConfigPath():
-	return getRootPath() + '/etc/'
+	return ensurePathSlash(os.path.join(getRootPath(), 'etc'))
+def getProgressPath():
+	return ensurePathSlash(os.path.join(getTmpPath(), 'progress'))
+	
 
 print 'USING ROOT PATH:'
 print getRootPath()
@@ -46,3 +58,18 @@ def readAsJSON(path):
 		return json.loads(read(path))
 	except ValueError:
 		return {}
+
+def getPortPath(host,port):
+	path = getOutPath()
+
+	if not path.endswith('/'):
+		path = path + '/'
+	if not host is None:
+		path = path + host + '/'
+	if not port is None:
+		path = path + port + '/'
+
+	return path
+
+def getSubDirs(path):
+	return [name for name in os.listdir(path) if os.path.isdir(os.path.join(path, name))]
