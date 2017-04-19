@@ -2,8 +2,7 @@ import uuid
 import subprocess
 import os
 import nmap_parser
-import nmap_xml_parser
-import web_scanner
+import generic_scanner
 from app.util import fileutil
 
 APP_ROOT = '.'
@@ -29,18 +28,28 @@ def RunAll(ip_list = '-iL ' + fileutil.getConfigPath() + 'ip_list'):
 	#get scan profiles
 	with open(fileutil.getConfigPath() + 'scan_profiles', 'r') as scan_file:
 		for scan in scan_file:
+			if scan.startswith("~web"):
+				generic_scanner.ScanAll(name="nikto", action="nikto -host {host} -port {port}", valid_services=['http'])
+				
+				wordlist = fileutil.getConfigPath() + 'wordlist.txt'
+				wfuzz = "wfuzz -c -z file," + wordlist + " --hc 404 {host}:{port}/FUZZ"
+				generic_scanner.ScanAll(name="wfuzz", action=wfuzz, valid_services=['http'])
+
+			elif scan.startswith("~snmp"):
+				generic_scanner.ScanAll(name="snmp_check", action="snmp-check -t {host} -c public", valid_ports=['161'])
+
+			elif scan.startswith("~smb"):
+				generic_scanner.ScanAll(name="smb_enum", action="enum4linux -a -R 500-550,1000-1050,3000-3050 {host}", valid_ports = ['139','445'], run_once=True)
+				
 			#confirm valid format and not a comment
-			if(':' in scan and not scan.startswith('#')):
+			elif(':' in scan and not scan.startswith('#')):
 				#run scan
 				profile = scan.rstrip('\n').split(':')
 				Run(profile[0],profile[1],ip_list)
 
-	web_scanner.ScanAll()
-
-	
 def ParseScan(scan):
 	path = fileutil.getTmpPath() + scan + '.xml'
 	if os.path.exists(path):
-		nmap_xml_parser.parseXML(path)
+		nmap_parser.parseXML(path)
 	else:
 		print 'Cannot parse scan: file does not exist'

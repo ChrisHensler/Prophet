@@ -1,121 +1,90 @@
-import os
-import re
+#!/usr/bin/env python
 
-APP_ROOT = '.'
+import xml.etree.ElementTree as ET
+import json
+from app.util import fileutil
+
 VERBOSE = False
-
-def parseGrepable(scan_results_file):
+DEBUG = False
+def parseXML(scan_results_file):
 	#parse nmap grepable output
-	print "ANALYZING GREPABLE: " + scan_results_file
-
-	with open(scan_results_file, 'r') as f:
-		for line in f:
-			#register new host
-			if('Up' in line): 
-				host = APP_ROOT + '/out/' + line.split(' ')[1]
-				if not os.path.exists(host):
-					os.makedirs(host)
-			#register ports			
-			if('/open/' in line):
-				#print "PARSING: " + line
-				host = APP_ROOT + '/out/' + line.split(' ')[1]
-				#print host
-				if not os.path.exists(host):
-					os.makedirs(host)
-
-				#parse ports
-				port_section = line[line.index("Ports: ") + 7:]
-				for portstring in port_section.split(','):
-					#print "portline: " + portstring
-					portinfo = portstring.split('/')
-					if(portinfo[1] == "open"):					
-						portpath = host + "/" + portinfo[2].strip() + "-" + portinfo[0].strip()
-						if(len(portinfo) > 3):
-							portpath = portpath + "-" + portinfo[4].strip()
-
-						#print "resolved: " + portpath
-
-						if not os.path.exists(portpath):
-							os.makedirs(portpath)
-	compileDependants()
-	print 'done'
+	print "ANALYZING XML_______________"
+	print scan_results_file
 	print "_______________________"
 
-def parseOSScan(scan_results_file):
-	print "ANALYZING OS SCAN:" + scan_results_file
+	root = ET.parse(scan_results_file).getroot()
 
-	#context variables
-	host = ""
-	record=True
-	scan_results = ""
+	
+	for host in root.findall('host'):
+		#create file, if not exists
+		hostpath = fileutil.getOutPath() + str(host.find('address').get('addr'))
+		fileutil.mkdir(hostpath)
 
-	with open(scan_results_file, 'r') as f:
-		for line in f:
-			possible_host = parseHost(line)
-			if len(possible_host) > 0 and possible_host != host:
-				#write old file
-				if(host != ""):
-					print "Writing host"
-					sysdir = APP_ROOT + "/out/"+host+"/system_info/"
-					if not os.path.exists(sysdir):
-						os.makedirs(sysdir)
-					with open(sysdir + "os_scan.results.txt", 'w') as hostfile:
-						hostfile.write(scan_results)
-			
-				#set new host
-				host = possible_host
-				scan_results = ""
-				print "Found host: " + host
+		#port services
+		makePortDirs(host, hostpath)
 
-			if record:
-				scan_results = scan_results + line + "\n" 
-
-	compileDependants()
-	print 'done'
-	print "_______________________"
+		for hostscript in host.iter('hostscript'):
+			storeScriptResults(hostscript, hostpath)
 
 
-def isIp(s):
-	match = getIp(s)
-	if match and s!="":
-		return len(match) == len(s)
-	return False	
+def makePortDirs(host, hostpath):
+	if DEBUG: print "MAKING PORT DIRECTORIES"
+	if(not hostpath.endswith('/')):
+		hostpath = hostpath + '/'
 
-def getIp(s):
-	m=re.search(r"\b\d{1,3}\.\d{1,3}\.\d{1,3}.\d{1,3}\b",s)
-	if m:
-		return m.group()
+	for port in host.iter('port'):
+			state = port.find('state').get('state');
+			if (state == 'open'):
+				service = port.find('service');
+				portpath = hostpath + str(port.get('protocol')) + '.' + str(port.get('portid')) + '.' + str(service.get('name'))
+				if DEBUG: print "ADDING " + portpath
 
-def parseHost(line):
-	ip =""
-	if "Nmap scan report" in line:
-		ip = getIp(line)
-	return ip
+				#create file, if not exists
+				fileutil.mkdir(portpath);
 
-def parseAll():
-	for item in os.listdir(APP_ROOT + "/tmp"):
-		if item.endswith(".OS"):
-			parseOSScan(APP_ROOT + "/tmp/" +item)
-		else:
-			parseGrepable(APP_ROOT + "/tmp/" +item)
-				
+				#store service info
+				aggServiceInfo(portpath, service)
 
-def compileDependants():
-	iplist_loc = get_iplist_location()
-	print "COMPILING " + iplist_loc
+				storeScriptResults(port, portpath);
+	#parse host level things
+	has_os_guess = False
+	guess_string = "OS Guesses:\n"
+	for osmatch in host.iter('osmatch'):
+		has_os_guess = True
+		guess_string += osmatch.get("accuracy") + "%: " + osmatch.get("name") + "\n"
 
-	ip_list_content = ""
-	for item in os.listdir(APP_ROOT + "/out"): 
-		if isIp(item): #only IP addresses expected
-			ip_list_content = ip_list_content + item + "\n"
-		elif(item != "ip_list"):
-			print "FOUND ATTEMPTED NON-IP IN ip_list: " + item
-		
-	ip_list_content = ip_list_content
-	with open(iplist_loc,"w") as f:
-		f.truncate()
-		f.write(ip_list_content)
+	uptime = host.find("uptime")
+	uptime_string = ""
+	if not uptime is None:
+		uptime_string = "\n\nUptime: " + uptime.get("seconds") + "s Last boot: " + uptime.get("lastboot") + "\n"
 
-def get_iplist_location():
-	return APP_ROOT + "/out/ip_list"
+	#write system_info file if we actually have information
+	#todo: implement some kind of merge system
+	if has_os_guess:
+		host_info_string = guess_string + uptime_string
+		fileutil.writeTo(hostpath + 'system_info.txt', host_info_string)
 
+def aggServiceInfo(servicepath, serviceNode):
+	if(not servicepath.endswith('/')):
+		servicepath = servicepath + '/'
+
+	filepath = servicepath + 'service_info.json'
+
+	#if exists, get old info
+	info = fileutil.readAsJSON(filepath)
+	
+	#load new info
+	for attr in ["name","product","version","ostype"]:
+		attrValue = str(serviceNode.get(attr))
+		if not attrValue.lower() in ["","none"]:
+			info[attr] = attrValue
+	#save
+	fileutil.writeJSONTo(filepath, info)
+
+def storeScriptResults(xmlContext, path):
+	if(not path.endswith('/')):
+		path = path + '/'
+
+	for script in xmlContext.findall('script'):
+		#fileutil.writeXMLTo(path + script.get('id') + '.scan.xml',script)
+		fileutil.writeTo(path + script.get('id') + '.nse.scan.txt',str(script.get('output')))

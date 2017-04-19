@@ -63,11 +63,11 @@ def getPortPath(host,port):
 	path = getOutPath()
 
 	if not path.endswith('/'):
-		path = path + '/'
+		path += '/'
 	if not host is None:
-		path = path + host + '/'
+		path += host + '/'
 	if not port is None:
-		path = path + port + '/'
+		path += port + '/'
 
 	return path
 
