@@ -13,7 +13,10 @@ while living:
 		print sep
 
 		if(first == "scan"):
-			scan_controller.RunAll()
+			if(len(cmd) > 1):
+				scan_controller.RunAll(cmd[1])
+			else:
+				scan_controller.RunAll()
 
 		elif(first == "parse"):
 			scan_controller.ParseScan(cmd.split(' ')[1])
@@ -38,9 +41,10 @@ while living:
 		#must be last
 		else:
 			print("Valid commands are:")
-			print("Scan: runs scan")
+			print("Scan <ip range>: runs scan")
 			print("Parse <scan id>: update reports based on the scan id")
 			print("Info <host> <port>: show info on host and optionally port")
+			print("Info <host> all: show info on host and all ports")
 			print("Exit: End Program")
 
 		print sep

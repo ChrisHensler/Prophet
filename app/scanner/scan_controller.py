@@ -17,7 +17,12 @@ def Run(name, flags, ip_list):
 	cmd = "%s %s %s %s %s" % ('nmap', flags, ip_list, '-oA', fileutil.getTmpPath() + str(scan_guid))
 	print 'running: ' + cmd
 
-	subprocess.call(cmd.split(' '))
+	#whitespace strip
+	c = []
+	for i in cmd.split(' '):
+		if not i.strip()=='':
+			c.append(i)
+	subprocess.call(c)
 
 	ParseScan(scan_guid)
 
@@ -31,7 +36,7 @@ def RunAll(ip_list = '-iL ' + fileutil.getConfigPath() + 'ip_list'):
 			if scan.startswith("~web"):
 				generic_scanner.ScanAll(name="nikto", action="nikto -host {host} -port {port}", valid_services=['http'])
 				
-				wordlist = fileutil.getConfigPath() + 'wordlist.txt'
+				wordlist = fileutil.getConfigPath() + 'web_discovery_wordlist.txt'
 				wfuzz = "wfuzz -c -z file," + wordlist + " --hc 404 {host}:{port}/FUZZ"
 				generic_scanner.ScanAll(name="wfuzz", action=wfuzz, valid_services=['http'])
 
