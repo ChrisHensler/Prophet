@@ -4,7 +4,8 @@
 discovery_ping: -sn
 discovery_quick_port: -Pn -sS --top-ports 10
 
-discovery_port: -sTU --top-ports 1000 
+discovery_port_TCP: -sT --top-ports 5000 
+discovery_port_UDP: -sU --top-ports 500 
 
 ~web
 ~snmp
@@ -12,4 +13,4 @@ discovery_port: -sTU --top-ports 1000
 
 service:  -A -sV -sTU --top-ports 1000  --script=default,banner-plus.nse,smb-enum-shares,http-enum,oracle-sid-brute,realvnc-auth-bypass,smtp-enum-users
 
-haystack: -sT -p 1-65535 --script=default,banner-plus.nse
+#haystack: -sT -p 1-65535 --script=default,banner-plus.nse

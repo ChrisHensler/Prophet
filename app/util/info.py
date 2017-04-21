@@ -14,6 +14,15 @@ HOST_INFO_STRING = """
 {2}
 """
 
+#colors
+port_color=color.blue
+host_color=color.red
+script_color=color.yellow
+important_color=color.red
+interesting_color=color.magenta
+
+
+
 def getInfoObj(host, detailed = True):
 	info = {}
 	path = fileutil.getPortPath(host, None)
@@ -67,7 +76,7 @@ def listHosts():
 	for filename in p:
 		info += filename.split('/')[-1] + '\n'
 
-	return color.white + info + color.neutral
+	return host_color + info + color.neutral
 
 def getInfoString(host, port=None):
 	if host is None: return listHosts()
@@ -79,45 +88,28 @@ def getInfoString(host, port=None):
 		
 	info = getInfoObj(host, detail_port)
 
-#	if(port is None):
-#		scanstring = ""
-#		for portObj in sorted(info["ports"], key=lambda x: int(x["name"].split(".")[1])):
-#			scanstring += parsePortObj(portObj)
-#		scanstring += color.magenta + "_"*40 + color.neutral + '\n'
-#
-#		#host level scripts
-#		for script in info["scan_results"]:	
-#				scanstring += getScanString(script["name"],script["text"])
-#		host_header = color.white + '_'*15 + host + '_'*15 + color.neutral
-#		infostring = HOST_INFO_STRING.format(host_header, scanstring, info["system_info"])
-#
-#	else:
-#		infostring = ""
-#		for portObj in info["ports"]:
-#			if port in portObj["name"]:
-#				infostring += parsePortObj(portObj)
-
 	infostring = ""
 	for portObj in sorted(info["ports"], key=lambda x: int(x["name"].split(".")[1])):
 		#port filter
 		if port is None or port == 'all' or port in portObj["name"]:	
 			infostring += parsePortObj(portObj)
 
-	infostring += color.magenta + "_"*40 + color.neutral + '\n'
+	infostring += port_color + "_"*40 + color.neutral + '\n'
 
 	#host level scripts
 	if detail_host:
 		scanstring = "Host Scan:"
 		for script in info["scan_results"]:
-				scanstring += getScanString(script["name"],script["text"])
-				host_header = color.white + '_'*15 + host + '_'*15 + color.neutral
-				#reformat infostring to host template
-				infostring = HOST_INFO_STRING.format(host_header, infostring, info["system_info"])
+			scanstring += getScanString(script["name"],script["text"])
+			host_header = host_color + '_'*15 + host + '_'*15 + color.neutral
+		scanstring += info["system_info"]
+		#reformat infostring to host template
+		infostring = HOST_INFO_STRING.format(host_header, infostring, scanstring)
 	return infostring
 
 
 def parsePortObj(portObj):
-	port_header = color.magenta + (portObj["name"].upper() + ("_" * 40))[:40] + "\n" + color.neutral
+	port_header = port_color + (portObj["name"].upper() + ("_" * 40))[:40] + "\n" + color.neutral
 	if DEBUG: print str(portObj["service_info"])
 	scanstring = port_header
 
@@ -135,14 +127,20 @@ def getScanString(name, text):
 	vuln_regex = re.compile('vulnerable', re.IGNORECASE)
 	text = re.sub(vuln_regex,vuln_token, text)
 	notvuln_regex = re.compile('not '+vuln_token, re.IGNORECASE)
-	text = re.sub(notvuln_regex, color.string(color.yellow, 'NOT VULNERABLE'), text)
-	text = re.sub(vuln_token, color.string(color.red, 'VULNERABLE'), text)
+	text = re.sub(notvuln_regex, color.string(interesting_color, 'NOT VULNERABLE'), text)
+	text = re.sub(vuln_token, color.string(important_color, 'VULNERABLE'), text)
 
 	#important things I want to know
-	important_things = ['Script execution failed (use -d to debug)','Forbidden']
+	interesting_things = ['Script execution failed (use -d to debug)','Forbidden']
+	for thing in interesting_things:
+		regex = re.compile(re.escape(thing), re.IGNORECASE)
+		regex.sub(thing, color.string(interesting_color, thing.upper()))
+
+	important_things = ['Success']
 	for thing in important_things:
-		text.replace(thing, color.string(color.orange, thing))
+		regex = re.compile(re.escape(thing), re.IGNORECASE)
+		regex.sub(thing, color.string(important_color, thing.upper()))
 
 
-	return "\n{2}{0}{3}\n______________\n{1}\n_________\n".format(name,text, color.yellow, color.neutral)
+	return "\n{2}{0}{3}\n______________\n{1}\n_________\n".format(name,text, script_color, color.neutral)
 
