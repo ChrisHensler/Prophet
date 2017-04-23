@@ -28,6 +28,7 @@ def getInfoObj(host, detailed = True):
 	path = fileutil.getPortPath(host, None)
 
 	#get sysinfo
+	info["name"] = host
 	info["system_info"] = fileutil.read(os.path.join(path,'system_info.txt'))
 	info["ports"] = []
 	info["scan_results"] = getScanResults(path)
@@ -64,19 +65,24 @@ def getScanResults(path):
 	return scan_results
 
 
-def listHosts():
-	path = fileutil.getPortPath(None, None)
-	info = ""
+def getHosts():
+	hosts = []
 
+	path = fileutil.getPortPath(None, None)
 	p = os.listdir(path)
 
 	#sort ip addresses
 	p = sorted(p,key=lambda item: socket.inet_aton(item))
 
 	for filename in p:
-		info += filename.split('/')[-1] + '\n'
+		hosts.append(filename.split('/')[-1])
 
-	return host_color + info + color.neutral
+	return hosts
+
+def listHosts():
+	info = ""
+
+	return host_color + '\n'.join(getHosts()) + color.neutral
 
 def getInfoString(host, port=None):
 	if host is None: return listHosts()
@@ -98,10 +104,11 @@ def getInfoString(host, port=None):
 
 	#host level scripts
 	if detail_host:
+		host_header = host_color + '_'*15 + host + '_'*15 + color.neutral
+
 		scanstring = "Host Scan:"
 		for script in info["scan_results"]:
 			scanstring += getScanString(script["name"],script["text"])
-			host_header = host_color + '_'*15 + host + '_'*15 + color.neutral
 		scanstring += info["system_info"]
 		#reformat infostring to host template
 		infostring = HOST_INFO_STRING.format(host_header, infostring, scanstring)

@@ -23,6 +23,8 @@ def getConfigPath():
 	return ensurePathSlash(os.path.join(getRootPath(), 'etc'))
 def getProgressPath():
 	return ensurePathSlash(os.path.join(getTmpPath(), 'progress'))
+def getSavePath():
+	return ensurePathSlash(os.path.join(getRootPath(), 'saved'))
 	
 
 print 'USING ROOT PATH:'
