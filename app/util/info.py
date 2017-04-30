@@ -15,37 +15,46 @@ HOST_INFO_STRING = """
 """
 
 #colors
-port_color=color.blue
+port_color=color.cyan
 host_color=color.red
 script_color=color.yellow
 important_color=color.red
 interesting_color=color.magenta
+info_color = color.blue
 
 
 
 def getInfoObj(host, detailed = True):
 	info = {}
 	path = fileutil.getPortPath(host, None)
-
 	#get sysinfo
 	info["name"] = host
 	info["system_info"] = fileutil.read(os.path.join(path,'system_info.txt'))
 	info["ports"] = []
-	info["scan_results"] = getScanResults(path)
+
+	
+	res = getScanResults(path)
+	info["scan_results"] = res
+
 	#get ports(if host), recurse if requested
 	for filename in os.listdir(path):
 		filepath = os.path.join(path, filename)
 		if os.path.isdir(filepath):
-			info["ports"].append(getPortInfoObj(filepath, detailed))
+			portObj = getPortInfoObj(filepath, detailed)
+			if portObj: info["ports"].append(portObj)
 
 	return info
 
 def getPortInfoObj(portpath, detailed = True):
 	portObj = {}
 	portObj["name"] = portpath.split('/')[-1]
+
 	portObj["service_info"] = fileutil.readAsJSON(os.path.join(portpath,'service_info.json'))
 	if detailed:
-		portObj["scan_results"] = getScanResults(portpath)
+
+		results = getScanResults(portpath)
+
+		portObj["scan_results"] = results
 	else:
 		portObj["scan_results"] = {}
 
@@ -61,9 +70,9 @@ def getScanResults(path):
 			scanObj["name"] = scanFilePath.split('/')[-1][:-9]
 			scanObj["text"] = fileutil.read(scanFilePath)
 
+			
 			scan_results.append(scanObj)
 	return scan_results
-
 
 def getHosts():
 	hosts = []
@@ -84,47 +93,68 @@ def listHosts():
 
 	return host_color + '\n'.join(getHosts()) + color.neutral
 
-def getInfoString(host, port=None):
-	if host is None: return listHosts()
+def getInfoString(host, port=None, script_filter=None):
+	if not host: return listHosts()
+
 	detail_port = not port is None
 	#display host details only if not infoing port or infoing everything
 	detail_host = True
 	if not port is None:
-		detail_host = (port == 'all')
+		detail_host = (port == 'all') or not script_filter is None
 		
 	info = getInfoObj(host, detail_port)
 
+	return parseHostString(info, port, detail_host, script_filter)
+
+
+def getRegex(string):
+	r=None
+	if not string is None:
+		r = re.compile(string, re.IGNORECASE)
+	else:
+		r = re.compile('.*')
+	return r
+
+def parseHostString(hostObj, port=None, detail_host=True,script_filter=None):
 	infostring = ""
-	for portObj in sorted(info["ports"], key=lambda x: int(x["name"].split(".")[1])):
+	host = hostObj["name"]
+	script_filter_regex = getRegex(script_filter)
+
+	for portObj in sorted(hostObj["ports"], key=lambda x: int(x["name"].split(".")[1])):
 		#port filter
 		if port is None or port == 'all' or port in portObj["name"]:	
-			infostring += parsePortObj(portObj)
+			infostring += parsePortObj(portObj, script_filter)
 
 	infostring += port_color + "_"*40 + color.neutral + '\n'
 
+	scanstring = ""
 	#host level scripts
 	if detail_host:
-		host_header = host_color + '_'*15 + host + '_'*15 + color.neutral
+		for script in hostObj["scan_results"]:
+			if script_filter_regex.match(script["name"]):
+				scanstring += getScanString(script["name"],script["text"])
+		scanstring += hostObj["system_info"]
 
-		scanstring = "Host Scan:"
-		for script in info["scan_results"]:
-			scanstring += getScanString(script["name"],script["text"])
-		scanstring += info["system_info"]
-		#reformat infostring to host template
-		infostring = HOST_INFO_STRING.format(host_header, infostring, scanstring)
+	#reformat infostring to host template
+	host_header = host_color + '_'*15 + host + '_'*15 + color.neutral
+	infostring = HOST_INFO_STRING.format(host_header, infostring, scanstring)
+
 	return infostring
 
 
-def parsePortObj(portObj):
+def parsePortObj(portObj, script_filter=None):
+	script_filter_regex = getRegex(script_filter)
 	port_header = port_color + (portObj["name"].upper() + ("_" * 40))[:40] + "\n" + color.neutral
-	if DEBUG: print str(portObj["service_info"])
+
+	if DEBUG: print 'parsePortObj: ' + str(portObj["service_info"])
 	scanstring = port_header
 
 	for key in portObj["service_info"]:
-		scanstring += "{0}: {1}\n".format(key.replace('_',' '),portObj["service_info"][key])
+		scanstring += color.string(info_color, "{0}: {1}\n".format(key.replace('_',' '),portObj["service_info"][key]))
 
 	for script in portObj["scan_results"]:	
-		scanstring += getScanString(script["name"],script["text"])
+		if script_filter_regex.match(script["name"]):
+			scanstring += getScanString(script["name"],script["text"])
 
 	return scanstring
 

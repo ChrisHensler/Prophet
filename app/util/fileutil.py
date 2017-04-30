@@ -5,7 +5,7 @@ import xml.dom.minidom as minidom
 
 
 
-
+debug = False
 
 def ensurePathSlash(path):
 	if not path.endswith('/'):
@@ -27,8 +27,8 @@ def getSavePath():
 	return ensurePathSlash(os.path.join(getRootPath(), 'saved'))
 	
 
-print 'USING ROOT PATH:'
-print getRootPath()
+if debug: print 'USING ROOT PATH:'
+if debug: print getRootPath()
 
 #create directory, if not exists
 def mkdir(path):
