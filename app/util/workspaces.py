@@ -42,3 +42,7 @@ def load(name):
 	with zipfile.ZipFile(zpath) as z:
 		z.extractall(path=opath)
 	print "load successful!"
+
+def printList():
+	for f in os.listdir(fileutil.getSavePath()):
+		print str(f).strip('.zip')

@@ -3,7 +3,8 @@ import subprocess
 import os
 import nmap_parser
 import generic_scanner
-from app.util import fileutil
+from app.util import fileutil, color
+from app.cracker import crack_controller
 
 APP_ROOT = '.'
 
@@ -15,7 +16,7 @@ def Run(name, flags, ip_list):
 	print "Scan Type: " + name
 
 	cmd = "%s %s %s %s %s" % ('nmap', flags, ip_list, '-oA', fileutil.getTmpPath() + str(scan_guid))
-	print 'running: ' + cmd
+	print 'running: ' + color.string(color.interesting_color, cmd)
 
 	#whitespace strip
 	c = []
@@ -46,6 +47,10 @@ def RunAll(ip_list = '-iL ' + fileutil.getConfigPath() + 'ip_list'):
 			elif scan.startswith("~smb"):
 				generic_scanner.ScanAll(name="smb_enum", action="enum4linux -a -R 500-550,1000-1050,3000-3050 {host}", valid_ports = ['139','445'], run_once=True)
 				
+			elif scan.startswith("~defaults"):
+				for host in fileutil.getSubDirs(fileutil.getPortPath(None,None)):
+					crack_controller.crackDefaults(host)
+
 			#confirm valid format and not a comment
 			elif(':' in scan and not scan.startswith('#')):
 				#run scan

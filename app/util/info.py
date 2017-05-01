@@ -20,6 +20,8 @@ host_color=color.red
 script_color=color.yellow
 important_color=color.red
 interesting_color=color.magenta
+good_color = color.green
+bad_color = color.red
 info_color = color.blue
 
 
@@ -32,7 +34,9 @@ def getInfoObj(host, detailed = True):
 	info["system_info"] = fileutil.read(os.path.join(path,'system_info.txt'))
 	info["ports"] = []
 
-	
+	if not os.path.exists(path):
+		return None
+
 	res = getScanResults(path)
 	info["scan_results"] = res
 
@@ -65,7 +69,7 @@ def getScanResults(path):
 
 	for scanFileName in os.listdir(path):
 		scanFilePath = os.path.join(path, scanFileName)
-		if os.path.isfile(scanFilePath) and scanFilePath.endswith(".scan.txt"):
+		if os.path.exists(scanFilePath) and os.path.isfile(scanFilePath) and scanFilePath.endswith(".scan.txt"):
 			scanObj = {}
 			scanObj["name"] = scanFilePath.split('/')[-1][:-9]
 			scanObj["text"] = fileutil.read(scanFilePath)
@@ -116,6 +120,9 @@ def getRegex(string):
 	return r
 
 def parseHostString(hostObj, port=None, detail_host=True,script_filter=None):
+	if(hostObj is None):
+		return "Host has not been scanned."
+
 	infostring = ""
 	host = hostObj["name"]
 	script_filter_regex = getRegex(script_filter)
@@ -167,17 +174,36 @@ def getScanString(name, text):
 	text = re.sub(notvuln_regex, color.string(interesting_color, 'NOT VULNERABLE'), text)
 	text = re.sub(vuln_token, color.string(important_color, 'VULNERABLE'), text)
 
-	#important things I want to know
-	interesting_things = ['Script execution failed (use -d to debug)','Forbidden']
-	for thing in interesting_things:
-		regex = re.compile(re.escape(thing), re.IGNORECASE)
-		regex.sub(thing, color.string(interesting_color, thing.upper()))
+	#### important things I want to know ####
+	bad_things = ['error','Script execution failed (use -d to debug)']
+	text = replace_with_regex(bad_things, text, bad_color)
 
-	important_things = ['Success']
-	for thing in important_things:
-		regex = re.compile(re.escape(thing), re.IGNORECASE)
-		regex.sub(thing, color.string(important_color, thing.upper()))
+	good_things = ['Successfully','Successful', 'success','login allowed']
+	text = replace_with_regex(good_things, text, good_color)
 
+	#raw regex
+	good_things_raw = ['[0-9]+ valid passwords found', 'Samba']
+	text = replace_with_regex_raw(good_things_raw, text, good_color)
 
-	return "\n{2}{0}{3}\n______________\n{1}\n_________\n".format(name,text, script_color, color.neutral)
+	interesting_things = ['Forbidden', 'passwords', 'password:', 'apache', 'version']
+	text = replace_with_regex(interesting_things, text, interesting_color)
+
+	if(name.lower().endswith('_crack.scan.txt')):
+		c = important_color
+	else:
+		c = script_color
+	return "\n{2}{0}{3}\n______________\n{1}\n_________\n".format(name,text, c, color.neutral)
+
+def replace_with_regex_raw(regex_arr, text, color_to_replace):
+	for thing in regex_arr:
+		for m in re.findall(thing, text, re.IGNORECASE):
+			text = text.replace(m, color.string(color_to_replace, m))
+	return text
+
+def replace_with_regex(regex_arr, text, color_to_replace):
+	new_regex = []
+	for i in range(0, len(regex_arr)):
+		new_regex.append(re.escape(regex_arr[i]))
+	return replace_with_regex_raw(new_regex, text, color_to_replace)
+	
 

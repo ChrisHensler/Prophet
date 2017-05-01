@@ -6,6 +6,7 @@ import sys
 
 import app.scanner.scan_controller as scan_controller
 from app.util import clean,info, workspaces, update, search
+from app.cracker import crack_controller
 
 
 #----ripped from docopt github
@@ -49,6 +50,9 @@ class ProphetShell(cmd.Cmd):
 
 
 	#--------------commands------------------
+	def emptyline(self):
+		pass
+
 	@docopt_cmd
 	def do_search(self, args):
 		"""Usage:
@@ -74,6 +78,23 @@ class ProphetShell(cmd.Cmd):
 		elif(args['--os']):
 			os = args['--os'].replace('_'," ")
 		print(search.search(ports=ports, os=os))
+
+	@docopt_cmd
+	def do_crack(self, args):  #docopt made me name it this
+		"""Usage:
+	crack <host> [<proto>] [(--default | --wordlist=<wordlist>)]
+
+	Options:
+		proto    protocol to crack, ex: ftp, ssh
+		--default   check default passwords (ironically, this is the default setting)
+		--wordlist   file location for wordlist, must follow user:pass format
+"""
+		if(args['<proto>'] is None):
+			crack_controller.crackDefaults(args['<host>'])
+		elif(args['<proto>'].lower() == 'ftp'):
+			crack_controller.crackFTP(args['<host>'])
+		elif(args['<proto>'].lower() == 'ssh'):
+			crack_controller.crackSSH(args['<host>'])
 
 	def do_scan(self, line):
 		"""Usage:
@@ -129,6 +150,11 @@ class ProphetShell(cmd.Cmd):
 			name = args[0]
 
 		workspaces.load(name)
+
+	def do_workspaces(self, line):
+		"lists saved workspaces"
+
+		workspaces.printList()
 
 	def do_clean(self, line):
 		"""

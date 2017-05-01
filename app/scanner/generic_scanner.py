@@ -41,7 +41,7 @@ def ScanHost(name, host, action, valid_services = [], valid_ports = [], run_once
 
 					cmd = parseCommand(cmd=action, scan_name=name, host=host, port=port, outfile=filepath)
 
-					print cmd
+					if debug: print cmd
 					subprocess.Popen(cmd, shell=True)
 
 	else: #host level scan
@@ -61,7 +61,7 @@ def parseCommand(cmd="", scan_name='Unknown', host='Unknown', port=None, outfile
 		print "scan will run in the background"
 
 		#procfile should exist while the process is running so we can track the process
-		procfile = "{4}__{0}__{1}__{2}__{3}__.proc".format(scan_name,host,port,str(datetime.datetime.now()).replace(' ','_'), fileutil.getTmpPath())
+		procfile = "{4}__{0}__{1}__{2}__{3}__.proc".format(scan_name.replace(' ', '_'),host,port,str(datetime.datetime.now()).replace(' ','_'), fileutil.getTmpPath())
 		cmd = "touch {0}; {1}".format(procfile,cmd)
 		if not '{outfile}' in cmd:
 			cmd += " > {outfile} "
@@ -73,8 +73,8 @@ def parseCommand(cmd="", scan_name='Unknown', host='Unknown', port=None, outfile
 		return cmd
 
 def getFinishedCmd(scan_name='Unknown', host='Unknown', port=None):
-	cmd = "; echo '{0} Scan on {1}".format(scan_name,host)
+	cmd = "; echo '{2}{0} Scan on {1}".format(scan_name,host, color.important_color)
 	if(not port is None):
 		cmd += ":" + str(port)
-	cmd += " complete';"
+	cmd += " complete{0}';".format(color.neutral)
 	return cmd

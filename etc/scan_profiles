@@ -10,6 +10,7 @@ discovery_port_UDP: -sU -T4 --top-ports 500
 ~web
 ~snmp
 ~smb
+~defaults
 
 service:  -A -sV -sTU -T4 --top-ports 1000  --script=default,banner-plus.nse,smb-enum-shares,http-enum,oracle-sid-brute,realvnc-auth-bypass,smtp-enum-users
 

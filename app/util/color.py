@@ -1,3 +1,4 @@
+import math
 
 color_prefix='\x1b['
 
@@ -11,6 +12,16 @@ cyan = color_prefix +'1;36m'
 white = color_prefix +'1;37m'
 neutral = color_prefix +'0m'
 
+
+port_color=cyan
+host_color=red
+script_color=yellow
+important_color=red
+interesting_color=magenta
+good_color = green
+bad_color = red
+info_color = blue
+
 CONSOLE_COLOR = neutral
 
 def setConsoleColor(color):
@@ -23,7 +34,9 @@ def c_print(color, text):
 def string(color, text):
 	start = color
 	end = CONSOLE_COLOR
-	return start + text + end
+
+	#join for supporting overlapping colors
+	return start + start.join(list(text)) + end
 
 if __name__=='__main__':
 	c_print(red,"red!")
