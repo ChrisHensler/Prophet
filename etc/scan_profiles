@@ -4,8 +4,8 @@
 discovery_ping: -sn
 discovery_quick_port: -T4 -Pn -sS --top-ports 10
 
-discovery_port_TCP: -sT -T5 --top-ports 5000 
-discovery_port_UDP: -sU -T4 --top-ports 500 
+#discovery_port_TCP: -sT -T5 --top-ports 5000 
+#discovery_port_UDP: -sU -T4 --top-ports 500 
 
 ~web
 ~snmp

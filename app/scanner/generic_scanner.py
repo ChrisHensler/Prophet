@@ -1,9 +1,14 @@
 import os
 import subprocess
-from app.util import fileutil
+from app.util import fileutil, color
 import datetime
+from multiprocessing import Pool
+
 
 debug = False
+
+POOL = Pool()
+
 
 def ScanAll(name, action, valid_services = [], valid_ports = [], run_once=False):
 	for host in fileutil.getSubDirs(fileutil.getPortPath(None,None)):
@@ -42,7 +47,8 @@ def ScanHost(name, host, action, valid_services = [], valid_ports = [], run_once
 					cmd = parseCommand(cmd=action, scan_name=name, host=host, port=port, outfile=filepath)
 
 					if debug: print cmd
-					subprocess.Popen(cmd, shell=True)
+					shell_exec(cmd)
+					
 
 	else: #host level scan
 		has_run=True
@@ -51,9 +57,17 @@ def ScanHost(name, host, action, valid_services = [], valid_ports = [], run_once
 		cmd = parseCommand(cmd=action, scan_name=name, host=host, port=None, outfile=filepath)
 
 		print cmd
-		subprocess.Popen(cmd, shell=True)
+		shell_exec(cmd)
 	if not has_run:
 		print "SKIPPING {0} SCAN".format(name)
+
+#not sure how to pickle keywords
+def shell_exec(cmd):
+	subprocess.Popen(cmd, shell=True)
+
+def shell_exec_p(cmd): 
+	POOL.apply_async(shell_exec, (cmd))
+
 
 def parseCommand(cmd="", scan_name='Unknown', host='Unknown', port=None, outfile="/dev/null"):
 		print "RUNNING {0} SCAN ON {1}:{2}".format(scan_name, host, str(port))

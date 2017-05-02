@@ -18,10 +18,6 @@ HOST_INFO_STRING = """
 port_color=color.cyan
 host_color=color.red
 script_color=color.yellow
-important_color=color.red
-interesting_color=color.magenta
-good_color = color.green
-bad_color = color.red
 info_color = color.blue
 
 
@@ -171,33 +167,37 @@ def getScanString(name, text):
 	vuln_regex = re.compile('vulnerable', re.IGNORECASE)
 	text = re.sub(vuln_regex,vuln_token, text)
 	notvuln_regex = re.compile('not '+vuln_token, re.IGNORECASE)
-	text = re.sub(notvuln_regex, color.string(interesting_color, 'NOT VULNERABLE'), text)
-	text = re.sub(vuln_token, color.string(important_color, 'VULNERABLE'), text)
+	text = re.sub(notvuln_regex, color.string(color.interesting_color, 'NOT VULNERABLE'), text)
+	text = re.sub(vuln_token, color.string(color.important_color, 'VULNERABLE'), text)
 
 	#### important things I want to know ####
-	bad_things = ['error','Script execution failed (use -d to debug)']
-	text = replace_with_regex(bad_things, text, bad_color)
-
-	good_things = ['Successfully','Successful', 'success','login allowed']
-	text = replace_with_regex(good_things, text, good_color)
-
-	#raw regex
-	good_things_raw = ['[0-9]+ valid passwords found', 'Samba']
-	text = replace_with_regex_raw(good_things_raw, text, good_color)
-
-	interesting_things = ['Forbidden', 'passwords', 'password:', 'apache', 'version']
-	text = replace_with_regex(interesting_things, text, interesting_color)
+	text=highlight('bad_things', color.bad_color,text)
+	text=highlight('good_things', color.good_color,text)
+	text=highlight('interesting_things', color.interesting_color,text)
 
 	if(name.lower().endswith('_crack.scan.txt')):
-		c = important_color
+		c = color.important_color
 	else:
 		c = script_color
 	return "\n{2}{0}{3}\n______________\n{1}\n_________\n".format(name,text, c, color.neutral)
 
+def highlight(kind, highlight_color,text):
+	etc_path = os.path.join(fileutil.getConfigPath(),'highlights')
+	getArr = lambda x: fileutil.read(os.path.join(etc_path, x)).split('\n')
+
+	things = getArr(kind + '.txt')
+	text = replace_with_regex(things, text, highlight_color)
+
+	things = getArr(kind + '_regex.txt')
+	text = replace_with_regex_raw(things, text, highlight_color)
+
+	return text
+
 def replace_with_regex_raw(regex_arr, text, color_to_replace):
 	for thing in regex_arr:
-		for m in re.findall(thing, text, re.IGNORECASE):
-			text = text.replace(m, color.string(color_to_replace, m))
+		if thing:
+			for m in re.findall(thing, text, re.IGNORECASE):
+				text = text.replace(m, color.string(color_to_replace, m))
 	return text
 
 def replace_with_regex(regex_arr, text, color_to_replace):

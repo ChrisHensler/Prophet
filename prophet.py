@@ -5,7 +5,7 @@ import cmd
 import sys
 
 import app.scanner.scan_controller as scan_controller
-from app.util import clean,info, workspaces, update, search
+from app.util import clean,info, workspaces, update, search, progress
 from app.cracker import crack_controller
 
 
@@ -116,7 +116,7 @@ class ProphetShell(cmd.Cmd):
 	@docopt_cmd
 	def do_info(self, args):
 		"""Usage:
-	info <host> [(<port>| --all)] [--script=<script_filter>]
+	info [<host>] [(<port>| --all)] [--script=<script_filter>]
 """
 		print args
 		host = args['<host>']
@@ -164,11 +164,13 @@ class ProphetShell(cmd.Cmd):
 
 		clean.clean()
 
+	def do_progress(self, line):
+		progress.progress()
+
 	def do_update(self, line):
 		"""
 	    update: updates dependants, such at NSE scripts
 """
-		args=line.split(' ')
 
 		update.update()
 

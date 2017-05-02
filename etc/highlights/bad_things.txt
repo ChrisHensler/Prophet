@@ -1,0 +1,2 @@
+error
+Script execution failed (use -d to debug)

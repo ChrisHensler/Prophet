@@ -8,6 +8,7 @@ from app.cracker import crack_controller
 
 APP_ROOT = '.'
 
+#run nmap scan. nmap scans are the backbone of the program and must be run in sequence
 def Run(name, flags, ip_list):
 
 	scan_guid = str(uuid.uuid1())
