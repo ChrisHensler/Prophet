@@ -3,7 +3,6 @@ import docopt
 
 DEBUG=False
 
-#todo: add OS search
 def search(ports=None, os=None):
 	hoststring = ""
 	for host in info.getHosts():

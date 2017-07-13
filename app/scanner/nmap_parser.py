@@ -1,18 +1,33 @@
 #!/usr/bin/env python
 
+import subprocess
 import xml.etree.ElementTree as ET
 import json
-from app.util import fileutil
+from app.util import fileutil, color
 
 VERBOSE = False
 DEBUG = False
+
+
+def parseIpRange(ip_range):
+	toReturn = []
+	p = subprocess.check_output(['nmap','-sL','-n',ip_range])
+	for line in p.split('\n'):
+		if 'scan report' in line:
+			toReturn.append(line.split(' ')[4])
+	return toReturn
+
 def parseXML(scan_results_file):
 	#parse nmap grepable output
 	print "ANALYZING XML_______________"
 	print scan_results_file
-	print "_______________________"
+	try:
+		parsed = ET.parse(scan_results_file)
 
-	root = ET.parse(scan_results_file).getroot()
+		root = parsed.getroot()
+	except:
+		color.c_print(color.bad_color, "Error parsing XML!")
+		return;
 
 	
 	for host in root.findall('host'):
@@ -26,6 +41,7 @@ def parseXML(scan_results_file):
 		for hostscript in host.iter('hostscript'):
 			storeScriptResults(hostscript, hostpath)
 
+	print "Done!"
 
 def makePortDirs(host, hostpath):
 	if DEBUG: print "MAKING PORT DIRECTORIES"

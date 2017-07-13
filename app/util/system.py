@@ -1,6 +1,7 @@
 import os
+from app.scanner import generic_scanner
+def exit():
+	generic_scanner.dispose()
 
-def shell_exec(cmd):
-	array_exec(cmd.split(' '))
-
-def array_exec(cmd):
+	print "THE PROPHET SLEEPS"
+	return True

@@ -100,7 +100,7 @@ def getInfoString(host, port=None, script_filter=None):
 	#display host details only if not infoing port or infoing everything
 	detail_host = True
 	if not port is None:
-		detail_host = (port == 'all') or not script_filter is None
+		detail_host = isAll(port) or not script_filter is None
 		
 	info = getInfoObj(host, detail_port)
 
@@ -125,7 +125,7 @@ def parseHostString(hostObj, port=None, detail_host=True,script_filter=None):
 
 	for portObj in sorted(hostObj["ports"], key=lambda x: int(x["name"].split(".")[1])):
 		#port filter
-		if port is None or port == 'all' or port in portObj["name"]:	
+		if port is None or isAll(port) or port in portObj["name"]:	
 			infostring += parsePortObj(portObj, script_filter)
 
 	infostring += port_color + "_"*40 + color.neutral + '\n'
@@ -205,5 +205,7 @@ def replace_with_regex(regex_arr, text, color_to_replace):
 	for i in range(0, len(regex_arr)):
 		new_regex.append(re.escape(regex_arr[i]))
 	return replace_with_regex_raw(new_regex, text, color_to_replace)
-	
+
+def isAll(port):
+	return port in ['all','*']
 

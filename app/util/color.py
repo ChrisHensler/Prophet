@@ -29,7 +29,7 @@ def setConsoleColor(color):
 	print CONSOLE_COLOR
 
 def c_print(color, text):
-	print color(color,text)
+	print string(color,text)
 
 def string(color, text):
 	start = color

@@ -4,14 +4,37 @@
 discovery_ping: -sn
 discovery_quick_port: -T4 -Pn -sS --top-ports 10
 
-#discovery_port_TCP: -sT -T5 --top-ports 5000 
+
+discovery_port_TCP: -sT -T5 --top-ports 5000 
 #discovery_port_UDP: -sU -T4 --top-ports 500 
+
 
 ~web
 ~snmp
 ~smb
-~defaults
+
 
 service:  -A -sV -sTU -T4 --top-ports 1000  --script=default,banner-plus.nse,smb-enum-shares,http-enum,oracle-sid-brute,realvnc-auth-bypass,smtp-enum-users
+
+
+~defaults
+
+
+###--script= <to scan> and not (<useless> or <scanned before>)
+vuln: -sTU -T4 --top-ports 1000  --script="(exploit or auth or vuln) and not (dos or smb-vuln* or http-* or ssl-* or rdp-vuln-ms12-020) and not (default or banner-plus.nse or smb-enum-shares or http-enum or smtp-enum-users)"
+
+
+###---adding to force a few risky scripts, assume services may go down from here on---###
+
+#smb vulns covered in course
+smb_vuln: -p 139,445  --script="smb-vuln-ms* or smb-vuln-c*" --script-args=unsafe=1
+
+
+mysql: -p 3306 -Pn --script=mysql-audit,mysql-databases,mysql-dump-hashes,mysql-empty-password,mysql-enum,mysql-info,mysql-query,mysql-users,mysql-variables,mysql-vuln-cve2012-2122
+
+smtp: --script=smtp-commands,smtp-enum-users,smtp-vuln-cve2010-4344,smtp-vuln-cve2011-1720,smtp-vuln-cve2011-1764 -p 25
+
+ftp: --script=ftp-anon,ftp-bounce,ftp-libopie,ftp-proftpd-backdoor,ftp-vsftpd-backdoor,ftp-vuln-cve2010-4221,tftp-enum -p 21 
+
 
 #haystack: -T4 -sT -p 1-65535 --script=default,banner-plus.nse

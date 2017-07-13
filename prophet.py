@@ -5,7 +5,7 @@ import cmd
 import sys
 
 import app.scanner.scan_controller as scan_controller
-from app.util import clean,info, workspaces, update, search, progress
+from app.util import clean,info, workspaces, update, search, progress, knock, system
 from app.cracker import crack_controller
 
 
@@ -48,6 +48,14 @@ class ProphetShell(cmd.Cmd):
 	intro = "THE PROPHET AWAKENS"
 	prompt="?>"
 
+	def bootstrap(self):
+		self.scanner = scan_controller.ScanController()
+
+	def terminate(self):
+		del self.scanner
+
+		print "THE PROPHET SLEEPS"
+		return True
 
 	#--------------commands------------------
 	def emptyline(self):
@@ -62,7 +70,7 @@ class ProphetShell(cmd.Cmd):
 		--os --linux --windows    filter by OS, replace spaces with underscores
 		--ports   filter by port
 """
-		print(args)
+		#print(args)
 
 		ports = None
 		if(args['-p']):
@@ -82,43 +90,74 @@ class ProphetShell(cmd.Cmd):
 	@docopt_cmd
 	def do_crack(self, args):  #docopt made me name it this
 		"""Usage:
-	crack <host> [<proto>] [(--default | --wordlist=<wordlist>)]
+	crack <host> [<service>] [(--default | --names | --wordlist=<wordlist>)]
 
 	Options:
 		proto    protocol to crack, ex: ftp, ssh
 		--default   check default passwords (ironically, this is the default setting)
+		--names		check common names against both username and password
 		--wordlist   file location for wordlist, must follow user:pass format
 """
-		if(args['<proto>'] is None):
-			crack_controller.crackDefaults(args['<host>'])
-		elif(args['<proto>'].lower() == 'ftp'):
-			crack_controller.crackFTP(args['<host>'])
-		elif(args['<proto>'].lower() == 'ssh'):
-			crack_controller.crackSSH(args['<host>'])
+		#translation
+		default = args['--default']
+		names = args['--names']
+		wordlist = args['<wordlist>']
+		service = args['<service>']
+		host = args['<host>']
+		
 
-	def do_scan(self, line):
-		"""Usage:
-	scan <ip_range>
-"""
-		args=line.split(' ')
-
-		if(len(args) > 0):
-			scan_controller.RunAll(args[0])
+		if default:
+			if host:
+				crack_controller.crackDefaults(service, host)
+			else:
+				crack_controller.crackDefaults(host)
+		elif names:
+			if not host:
+				color.c_print(color.bad_color, 'Please select a host')
+			else:
+				crack_controller.crackSimpleNames(host)
+		elif wordlist:
+			if not host or not service:
+				color.c_print(color.bad_color, 'Please select a host and service')
+			else:
+				crack(service, host, split_wordlist=wordlist, threads=4)
 		else:
-			scan_controller.RunAll()
+			color.c_print(color.bad_color, 'Something has gone very wrong. Get Mom.')
 
-	def do_parse(self, line):
-		"""
-	parse <scan id>: update reports based on the scan id
+	@docopt_cmd
+	def do_knock(self, args):
+		"""Usage:
+	knock <host> <ports>...
 """
-		args=line.split(' ')
-		scan_controller.ParseScan(args[1])
+		knock.knock(args['<host>'], args['<ports>'])
+
+	@docopt_cmd
+	def do_scan(self, args):
+		"""Usage:
+	scan <ip_range> [<scans>...]
+
+	Scans IP range
+"""
+		ip_range=args['<ip_range>']
+		scans=args['<scans>']
+		self.scanner.RunAll(ip_range, scans)
+
+
+	@docopt_cmd
+	def do_parse(self, args):
+		"""Usage:
+	parse <scan_id>
+
+	update reports based on the scan id
+"""
+		self.scanner.ParseScan(args['<scan_id>'])
+
 	@docopt_cmd
 	def do_info(self, args):
 		"""Usage:
 	info [<host>] [(<port>| --all)] [--script=<script_filter>]
 """
-		print args
+		#print args
 		host = args['<host>']
 		port = args['<port>']
 		if(args['--all']):
@@ -175,6 +214,15 @@ class ProphetShell(cmd.Cmd):
 		update.update()
 
 	@docopt_cmd
+	def do_quit(self, args):
+		"""Usage:
+	quit
+
+	Quits
+"""
+		return self.terminate()
+
+	@docopt_cmd
 	def do_exit(self, args):
 		"""Usage:
 	exit [--ip_range=<ip_range>] [<swears>...]
@@ -184,13 +232,11 @@ class ProphetShell(cmd.Cmd):
 		if(args['--ip_range']):
 			print "Why did you think that would work?"
 		else:
-			print "THE PROPHET SLEEPS"
-			return True
-
-	#def do_help(self, line):
-	#	print __doc__
+			return self.terminate()
 
 
 if __name__ =='__main__':
-	ProphetShell().cmdloop()
+	shell = ProphetShell()
+	shell.bootstrap()
+	shell.cmdloop()
 
