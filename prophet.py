@@ -7,7 +7,7 @@ import sys
 import app.scanner.scan_controller as scan_controller
 from app.util import clean,info, workspaces, update, search, progress, knock, system
 from app.cracker import crack_controller
-
+from app.probe import connect, extract
 
 #----ripped from docopt github
 def docopt_cmd(func):
@@ -167,6 +167,29 @@ class ProphetShell(cmd.Cmd):
 
 		print info.getInfoString(host, port, script_filter)
 
+	@docopt_cmd
+	def do_connect(self, args):
+		"""Usage:
+	connect <host>
+
+	connects to a host if there is an applicable connect script
+"""
+		#print args
+		host = args['<host>']
+
+		connect.connect_interactive(host)
+
+	@docopt_cmd
+	def do_extract(self, args):
+		"""Usage:
+	extract <host>
+
+	extracts local data from a host if there is an applicable connect script
+"""
+		#print args
+		host = args['<host>']
+
+		extract.extract(host)
 	def do_save(self, line):
 		"""
 	save <name>: saves a scan with the given name

@@ -32,7 +32,7 @@ def parseXML(scan_results_file):
 	
 	for host in root.findall('host'):
 		#create file, if not exists
-		hostpath = fileutil.getOutPath() + str(host.find('address').get('addr'))
+		hostpath = fileutil.getRemoteOutPath() + str(host.find('address').get('addr'))
 		fileutil.mkdir(hostpath)
 
 		#port services

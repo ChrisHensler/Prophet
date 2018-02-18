@@ -17,15 +17,23 @@ def getRootPath():
 	return ensurePathSlash(root)
 def getOutPath():
 	return ensurePathSlash(os.path.join(getRootPath(),'out'))
+def getRemoteOutPath():
+	return ensurePathSlash(os.path.join(getOutPath(),'remote'))
+def getLocalOutPath():
+	return ensurePathSlash(os.path.join(getOutPath(),'local'))
 def getTmpPath():
 	return ensurePathSlash(os.path.join(getRootPath(), 'tmp'))
 def getConfigPath():
 	return ensurePathSlash(os.path.join(getRootPath(), 'etc'))
 def getProgressPath():
 	return ensurePathSlash(os.path.join(getTmpPath(), 'progress'))
+def getConnectPath():
+	return ensurePathSlash(os.path.join(getRootPath(), 'connect'))
 def getSavePath():
 	return ensurePathSlash(os.path.join(getRootPath(), 'saved'))
-	
+def getWebLocalPath():
+	return "/var/www/html/prophet/"
+
 
 if debug: print 'USING ROOT PATH:'
 if debug: print getRootPath()
@@ -34,6 +42,7 @@ if debug: print getRootPath()
 def mkdir(path):
 	if not os.path.exists(path):
 		os.makedirs(path)
+	return path
 
 def writeTo(path, content):
 	with open(path,'w') as f:
@@ -61,8 +70,11 @@ def readAsJSON(path):
 	except ValueError:
 		return {}
 
+def getHostPath(host):
+	return getPortPath(host, None)
+
 def getPortPath(host,port):
-	path = getOutPath()
+	path = getRemoteOutPath()
 
 	if not path.endswith('/'):
 		path += '/'
