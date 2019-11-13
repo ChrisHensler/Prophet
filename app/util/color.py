@@ -26,10 +26,10 @@ CONSOLE_COLOR = neutral
 
 def setConsoleColor(color):
 	CONSOLE_COLOR = color
-	print CONSOLE_COLOR
+	print(CONSOLE_COLOR)
 
 def c_print(color, text):
-	print string(color,text)
+	print(string(color,text))
 
 def string(color, text):
 	start = color

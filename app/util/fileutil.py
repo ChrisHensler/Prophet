@@ -35,8 +35,8 @@ def getWebLocalPath():
 	return "/var/www/html/prophet/"
 
 
-if debug: print 'USING ROOT PATH:'
-if debug: print getRootPath()
+if debug: print('USING ROOT PATH:')
+if debug: print(getRootPath())
 
 #create directory, if not exists
 def mkdir(path):

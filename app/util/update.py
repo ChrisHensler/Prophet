@@ -5,5 +5,5 @@ DEBUG=False
 
 def update():
 	for cmd in ['nmap --script-updatedb','updatedb']:
-		print cmd
+		print(cmd)
 		subprocess.call(cmd, shell=True)

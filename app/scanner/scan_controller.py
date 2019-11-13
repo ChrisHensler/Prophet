@@ -1,10 +1,11 @@
 import uuid
 import subprocess
 import os
-import nmap_parser
-import generic_scanner
-import nmap_parser
-from app.util import fileutil, color
+import app.scanner.nmap_parser
+import app.scanner.generic_scanner as generic_scanner
+import app.scanner.nmap_parser
+import app.util.fileutil as fileutil
+import app.util.color as color
 from app.cracker import crack_controller
 
 APP_ROOT = '.'
@@ -17,18 +18,18 @@ def ParseScan(scan):
 	if os.path.exists(path):
 		nmap_parser.parseXML(path)
 	else:
-		print 'Cannot parse scan: file does not exist'
+		print('Cannot parse scan: file does not exist')
 
 #run nmap scan. nmap scans are the backbone of the program and must be run in sequence
 def Run(name, flags, ip_list):
 
 	scan_guid = str(uuid.uuid1())
 
-	print "Starting scan: " + scan_guid
-	print "Scan Type: " + name
+	print("Starting scan: " + scan_guid)
+	print("Scan Type: " + name)
 
 	cmd = "%s %s %s %s %s" % ('nmap', flags, ip_list, '-oA', fileutil.getTmpPath() + str(scan_guid))
-	print 'running: ' + color.string(color.interesting_color, cmd)
+	print('running: ' + color.string(color.interesting_color, cmd))
 
 	#todo: do in non-shell way
 	subprocess.call(cmd, shell=True)
@@ -45,7 +46,7 @@ class ScanController:
 		Run(name, flags, ip_list)
 
 	def RunAll(self, ip_range, valid_scans=None):
-		print "SCANNING RANGE: " + ip_range
+		print("SCANNING RANGE: " + ip_range)
 
 		#get scan profiles
 		with open(fileutil.getConfigPath() + 'scan_profiles', 'r') as scan_file:

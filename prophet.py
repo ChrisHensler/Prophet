@@ -54,7 +54,7 @@ class ProphetShell(cmd.Cmd):
 	def terminate(self):
 		del self.scanner
 
-		print "THE PROPHET SLEEPS"
+		print("THE PROPHET SLEEPS")
 		return True
 
 	#--------------commands------------------
@@ -70,7 +70,6 @@ class ProphetShell(cmd.Cmd):
 		--os --linux --windows    filter by OS, replace spaces with underscores
 		--ports   filter by port
 """
-		#print(args)
 
 		ports = None
 		if(args['-p']):
@@ -157,7 +156,6 @@ class ProphetShell(cmd.Cmd):
 		"""Usage:
 	info [<host>] [(<port>| --all)] [--script=<script_filter>]
 """
-		#print args
 		host = args['<host>']
 		port = args['<port>']
 		if(args['--all']):
@@ -165,7 +163,7 @@ class ProphetShell(cmd.Cmd):
 
 		script_filter= args['--script']
 
-		print info.getInfoString(host, port, script_filter)
+		print(info.getInfoString(host, port, script_filter))
 
 	@docopt_cmd
 	def do_connect(self, args):
@@ -174,7 +172,6 @@ class ProphetShell(cmd.Cmd):
 
 	connects to a host if there is an applicable connect script
 """
-		#print args
 		host = args['<host>']
 
 		connect.connect_interactive(host)
@@ -186,7 +183,6 @@ class ProphetShell(cmd.Cmd):
 
 	extracts local data from a host if there is an applicable connect script
 """
-		#print args
 		host = args['<host>']
 
 		extract.extract(host)
@@ -253,7 +249,7 @@ class ProphetShell(cmd.Cmd):
 	Autopwn target ip range
 """
 		if(args['--ip_range']):
-			print "Why did you think that would work?"
+			print("Why did you think that would work?")
 		else:
 			return self.terminate()
 

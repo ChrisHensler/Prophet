@@ -1,6 +1,6 @@
 import os
-from app.scanner import generic_scanner
-from app.util import fileutil
+import app.scanner.generic_scanner
+import app.util.fileutil
 
 APP_ROOT = '.'
 
@@ -21,7 +21,7 @@ def crackDefault(service, host):
 
 def crack(service, host, split_wordlist=None, user_list=None, password_list=None, threads = 1):
 	if not service in ['ftp','ssh','mssql','mysql','oracle','telnet']:
-		print "crack: Unsupported service: " + service
+		print("crack: Unsupported service: " + service)
 		return
 
 	if split_wordlist:

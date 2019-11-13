@@ -1,4 +1,5 @@
-from app.util import info, color
+import app.util.info
+import app.util.color
 import imports.docopt
 
 DEBUG=False
@@ -15,7 +16,7 @@ def checkFilter(filterString, value):
 	if(filterString is None): return False
 	filterArr=filterString.split(',')
 
-	if DEBUG: print "checking filter: " + str(filterArr) + " on " + str(value)
+	if DEBUG: print("checking filter: " + str(filterArr) + " on " + str(value))
 
 	return value in filterArr
 

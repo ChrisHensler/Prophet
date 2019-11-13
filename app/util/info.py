@@ -1,8 +1,8 @@
 import shutil
 import os
-import fileutil
+import app.util.fileutil
 import socket
-import color
+import app.util.color as color
 import re
 
 DEBUG=False
@@ -149,7 +149,7 @@ def parsePortObj(portObj, script_filter=None):
 	script_filter_regex = getRegex(script_filter)
 	port_header = port_color + (portObj["name"].upper() + ("_" * 40))[:40] + "\n" + color.neutral
 
-	if DEBUG: print 'parsePortObj: ' + str(portObj["service_info"])
+	if DEBUG: print('parsePortObj: ' + str(portObj["service_info"]))
 	scanstring = port_header
 
 	for key in portObj["service_info"]:

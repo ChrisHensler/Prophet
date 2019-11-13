@@ -1,7 +1,7 @@
 import zipfile
-import fileutil
+import app.util.fileutil
 import os
-import clean
+import app.util.clean
 
 DEBUG=False
 
@@ -15,14 +15,14 @@ def save(name, overwrite = False):
 
 	#check existence of file and confirm overwrite
 	if os.path.exists(zpath) and not overwrite:
-		print name + " exists. Are you sure you want to overwrite? (Y/n)"
+		print(name + " exists. Are you sure you want to overwrite? (Y/n)")
 		resp = raw_input()
 		#starts with y or is whitespace
 		if not (resp.lower().startswith('y') or len(resp.strip())==0):
-			print 'cancelling save'
+			print('cancelling save')
 			return
-	print 'saving workspace: ' + name
-	print opath
+	print('saving workspace: ' + name)
+	print(opath)
 	with zipfile.ZipFile(zpath, 'w', zipfile.ZIP_DEFLATED) as z:
 		for root, dirs, files in os.walk(opath):
 			for f in files:
@@ -38,11 +38,11 @@ def load(name):
 	#clear out
 	clean.cleanOut()
 
-	print "loading..."
+	print("loading...")
 	with zipfile.ZipFile(zpath) as z:
 		z.extractall(path=opath)
-	print "load successful!"
+	print("load successful!")
 
 def printList():
 	for f in os.listdir(fileutil.getSavePath()):
-		print str(f).strip('.zip')
+		print(str(f).strip('.zip'))

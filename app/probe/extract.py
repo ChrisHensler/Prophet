@@ -20,12 +20,12 @@ def debug(msg):
 		print(msg)
 
 def error(msg):
-	print msg
+	print(msg)
 
 def writeFile(host, filename, content):
 	path=os.path.join(fileutil.getLocalOutPath(), host)
 	path= os.path.join(fileutil.mkdir(path), filename) #ensure existance of directory
-	print "PRINTING TO " + path
+	print("PRINTING TO " + path)
 	fileutil.writeTo(path, content)
 
 ###Post

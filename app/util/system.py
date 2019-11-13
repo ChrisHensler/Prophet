@@ -1,7 +1,7 @@
 import os
-from app.scanner import generic_scanner
+import app.scanner.generic_scanner
 def exit():
 	generic_scanner.dispose()
 
-	print "THE PROPHET SLEEPS"
+	print("THE PROPHET SLEEPS")
 	return True

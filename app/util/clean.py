@@ -1,6 +1,6 @@
 import shutil
 import os
-import fileutil
+import app.util.fileutil
 
 def clean():
 	cleanOut()
@@ -11,7 +11,7 @@ def clean():
 	cleanFile("hydra.restore")
 
 
-	print "WE ARE NOW CLEAN!"
+	print("WE ARE NOW CLEAN!")
 
 def cleanTmp():
 	cleanDir(fileutil.getTmpPath())

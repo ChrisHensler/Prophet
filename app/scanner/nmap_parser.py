@@ -3,7 +3,8 @@
 import subprocess
 import xml.etree.ElementTree as ET
 import json
-from app.util import fileutil, color
+import app.util.fileutil
+import app.util.color
 
 VERBOSE = False
 DEBUG = False
@@ -19,8 +20,8 @@ def parseIpRange(ip_range):
 
 def parseXML(scan_results_file):
 	#parse nmap grepable output
-	print "ANALYZING XML_______________"
-	print scan_results_file
+	print("ANALYZING XML_______________")
+	print(scan_results_file)
 	try:
 		parsed = ET.parse(scan_results_file)
 
@@ -41,27 +42,27 @@ def parseXML(scan_results_file):
 		for hostscript in host.iter('hostscript'):
 			storeScriptResults(hostscript, hostpath)
 
-	print "Done!"
+	print("Done!")
 
 def makePortDirs(host, hostpath):
-	if DEBUG: print "MAKING PORT DIRECTORIES"
+	if DEBUG: print("MAKING PORT DIRECTORIES")
 	if(not hostpath.endswith('/')):
 		hostpath = hostpath + '/'
 
 	for port in host.iter('port'):
-			state = port.find('state').get('state');
+			state = port.find('state').get('state')
 			if (state == 'open'):
-				service = port.find('service');
+				service = port.find('service')
 				portpath = hostpath + str(port.get('protocol')) + '.' + str(port.get('portid')) + '.' + str(service.get('name'))
-				if DEBUG: print "ADDING " + portpath
+				if DEBUG: print("ADDING " + portpath)
 
 				#create file, if not exists
-				fileutil.mkdir(portpath);
+				fileutil.mkdir(portpath)
 
 				#store service info
 				aggServiceInfo(portpath, service)
 
-				storeScriptResults(port, portpath);
+				storeScriptResults(port, portpath)
 	#parse host level things
 	has_os_guess = False
 	guess_string = "OS Guesses:\n"
