@@ -1,8 +1,8 @@
 import os
 import subprocess
-import app.util.fileutil
-import app.util.color
-import app.scanner.nmap_parser
+import app.util.fileutil as fileutil
+import app.util.color as color
+import app.scanner.nmap_parser as nmap_parser
 import datetime
 from threading import Lock
 from multiprocessing import Pool

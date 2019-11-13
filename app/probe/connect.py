@@ -9,8 +9,8 @@ import shutil
 import os
 import threading
 import datetime
-import app.util.fileutil
-import app.util.webutil
+import app.util.fileutil as fileutil
+import app.util.webutil as webutil
 
 DEBUG=True
 

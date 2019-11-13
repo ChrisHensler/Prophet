@@ -1,12 +1,11 @@
 import uuid
 import subprocess
 import os
-import app.scanner.nmap_parser
 import app.scanner.generic_scanner as generic_scanner
-import app.scanner.nmap_parser
+import app.scanner.nmap_parser as nmap_parser
 import app.util.fileutil as fileutil
 import app.util.color as color
-from app.cracker import crack_controller
+import app.cracker.crack_controller as crack_controller
 
 APP_ROOT = '.'
 

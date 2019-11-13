@@ -1,6 +1,6 @@
 import os
-import app.scanner.generic_scanner
-import app.util.fileutil
+import app.scanner.generic_scanner as generic_scanner
+import app.util.fileutil as fileutil
 
 APP_ROOT = '.'
 
@@ -8,11 +8,13 @@ APP_ROOT = '.'
 def crackDefaults(host):
 	for service in ['ftp','ssh','mssql','mysql','oracle','telnet','snmp']:
 		crackDefault(service, host)
+		
 
 def crackSimpleNames(host):
 		#quick test of standard names
 		standard_list=os.path.join(fileutil.getConfigPath(), 'wordlists','common','names_lower.txt')
 		crack(service, host, user_list=standard_list)
+
 
 def crackDefault(service, host):
 	split_wordlist = os.path.join(fileutil.getConfigPath(), 'wordlists','defaults',service + '.split.txt -o {outfile}')

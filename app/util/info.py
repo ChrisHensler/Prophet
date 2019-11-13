@@ -1,6 +1,6 @@
 import shutil
 import os
-import app.util.fileutil
+import app.util.fileutil as fileutil
 import socket
 import app.util.color as color
 import re

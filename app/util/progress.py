@@ -1,6 +1,6 @@
 import shutil
 import os
-import app.util.fileutil
+import app.util.fileutil as fileutil
 
 def progress():
 	for f in os.listdir(fileutil.getTmpPath()):

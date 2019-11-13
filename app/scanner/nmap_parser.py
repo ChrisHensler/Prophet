@@ -3,8 +3,8 @@
 import subprocess
 import xml.etree.ElementTree as ET
 import json
-import app.util.fileutil
-import app.util.color
+import app.util.fileutil as fileutil
+import app.util.color as color
 
 VERBOSE = False
 DEBUG = False

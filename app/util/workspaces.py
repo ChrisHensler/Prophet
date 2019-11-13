@@ -1,7 +1,7 @@
 import zipfile
-import app.util.fileutil
+import app.util.fileutil as fileutil
 import os
-import app.util.clean
+import app.util.clean as clean
 
 DEBUG=False
 

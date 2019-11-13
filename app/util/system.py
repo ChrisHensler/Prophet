@@ -1,5 +1,5 @@
 import os
-import app.scanner.generic_scanner
+import app.scanner.generic_scanner as generic_scanner
 def exit():
 	generic_scanner.dispose()
 

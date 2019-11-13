@@ -1,6 +1,6 @@
-import app.util.info
-import app.util.color
-import imports.docopt
+import app.util.info as info
+import app.util.color as color
+import imports.docopt as docopt
 
 DEBUG=False
 
