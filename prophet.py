@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from docopt import docopt, DocoptExit
+from imports.docopt import docopt, DocoptExit
 import cmd
 import sys
 

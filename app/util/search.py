@@ -1,5 +1,5 @@
 from app.util import info, color
-import docopt
+import imports.docopt
 
 DEBUG=False
 
@@ -17,7 +17,7 @@ def checkFilter(filterString, value):
 
 	if DEBUG: print "checking filter: " + str(filterArr) + " on " + str(value)
 
-	return value in filterArr;
+	return value in filterArr
 
 def parseHostString(hostObj, filter_ports, filter_os):
 	infostring = ""

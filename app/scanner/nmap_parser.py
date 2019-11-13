@@ -27,7 +27,7 @@ def parseXML(scan_results_file):
 		root = parsed.getroot()
 	except:
 		color.c_print(color.bad_color, "Error parsing XML!")
-		return;
+		return
 
 	
 	for host in root.findall('host'):

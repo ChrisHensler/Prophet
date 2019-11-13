@@ -3,7 +3,6 @@ import subprocess
 from app.util import fileutil, color
 import nmap_parser
 import datetime
-import ipaddress
 from threading import Lock
 from multiprocessing import Pool
 
