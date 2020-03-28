@@ -12,25 +12,38 @@ def ensurePathSlash(path):
 		path = path + '/'
 	return path
 
-root = os.getcwd();
+def ensureDirectoryExists(path):
+	dir_path = ensurePathSlash(path)
+	os.makedirs(dir_path, exist_ok=True)
+	return dir_path
+
+root = os.getcwd()
 def getRootPath():
-	return ensurePathSlash(root)
+	return ensureDirectoryExists(root)
 def getOutPath():
-	return ensurePathSlash(os.path.join(getRootPath(),'out'))
+	return ensureDirectoryExists(os.path.join(getRootPath(),'out'))
+
 def getRemoteOutPath():
-	return ensurePathSlash(os.path.join(getOutPath(),'remote'))
+	return ensureDirectoryExists(os.path.join(getOutPath(),'remote'))
+
 def getLocalOutPath():
-	return ensurePathSlash(os.path.join(getOutPath(),'local'))
+	return ensureDirectoryExists(os.path.join(getOutPath(),'local'))
+
 def getTmpPath():
-	return ensurePathSlash(os.path.join(getRootPath(), 'tmp'))
+	return ensureDirectoryExists(os.path.join(getRootPath(), 'tmp'))
+
 def getConfigPath():
-	return ensurePathSlash(os.path.join(getRootPath(), 'etc'))
+	return ensureDirectoryExists(os.path.join(getRootPath(), 'etc'))
+
 def getProgressPath():
-	return ensurePathSlash(os.path.join(getTmpPath(), 'progress'))
+	return ensureDirectoryExists(os.path.join(getTmpPath(), 'progress'))
+
 def getConnectPath():
-	return ensurePathSlash(os.path.join(getRootPath(), 'connect'))
+	return ensureDirectoryExists(os.path.join(getRootPath(), 'connect'))
+
 def getSavePath():
-	return ensurePathSlash(os.path.join(getRootPath(), 'saved'))
+	return ensureDirectoryExists(os.path.join(getRootPath(), 'saved'))
+
 def getWebLocalPath():
 	return "/var/www/html/prophet/"
 

@@ -13,9 +13,9 @@ DEBUG = False
 def parseIpRange(ip_range):
 	toReturn = []
 	p = subprocess.check_output(['nmap','-sL','-n',ip_range])
-	for line in p.split('\n'):
-		if 'scan report' in line:
-			toReturn.append(line.split(' ')[4])
+	for line in p.split(b'\n'):
+		if b'scan report' in line:
+			toReturn.append(line.split(b' ')[4])
 	return toReturn
 
 def parseXML(scan_results_file):
