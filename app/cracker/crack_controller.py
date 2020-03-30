@@ -10,7 +10,7 @@ def crackDefaults(host):
 		crackDefault(service, host)
 		
 
-def crackSimpleNames(host):
+def crackSimpleNames(service, host):
 		#quick test of standard names
 		standard_list=os.path.join(fileutil.getConfigPath(), 'wordlists','common','names_lower.txt')
 		crack(service, host, user_list=standard_list)

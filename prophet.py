@@ -7,6 +7,7 @@ import app.scanner.scan_controller as scan_controller
 from app.util import clean,info, workspaces, update, search, progress, knock, system
 from app.cracker import crack_controller
 from app.probe import connect, extract
+from app.util import color
 
 #----ripped from docopt github
 def docopt_cmd(func):
@@ -106,19 +107,21 @@ class ProphetShell(cmd.Cmd):
 
 		if default:
 			if host:
-				crack_controller.crackDefaults(service, host)
-			else:
 				crack_controller.crackDefaults(host)
+			else:
+				color.c_print(color.bad_color, 'Please select a host')
 		elif names:
 			if not host:
 				color.c_print(color.bad_color, 'Please select a host')
+			if not service:
+				color.c_print(color.bad_color, 'Please select a service')
 			else:
-				crack_controller.crackSimpleNames(host)
+				crack_controller.crackSimpleNames(service, host)
 		elif wordlist:
 			if not host or not service:
 				color.c_print(color.bad_color, 'Please select a host and service')
 			else:
-				crack(service, host, split_wordlist=wordlist, threads=4)
+				crack_controller.crack(service, host, split_wordlist=wordlist, threads=4)
 		else:
 			color.c_print(color.bad_color, 'Something has gone very wrong. Get Mom.')
 
@@ -185,6 +188,7 @@ class ProphetShell(cmd.Cmd):
 		host = args['<host>']
 
 		extract.extract(host)
+
 	def do_save(self, line):
 		"""
 	save <name>: saves a scan with the given name
@@ -217,8 +221,6 @@ class ProphetShell(cmd.Cmd):
 		"""
 	    clean: cleans the temporary files and current session
 """
-		args=line.split(' ')
-
 		clean.clean()
 
 	def do_progress(self, line):

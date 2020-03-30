@@ -41,8 +41,13 @@ class ScanController:
 	def __del__(self):
 		del self.scanner
 
+
 	def Run(self, name, flags, ip_list):
 		Run(name, flags, ip_list)
+
+	def ParseScan(self, scan):
+		ParseScan(scan)
+
 
 	def RunAll(self, ip_range, valid_scans=None):
 		print("SCANNING RANGE: " + ip_range)
@@ -52,6 +57,7 @@ class ScanController:
 			for scan in scan_file:
 				if scan.startswith('#'):
 					continue
+
 				elif checkHookScan(scan, "~web", valid_scans):
 					self.scanner.ScanAll(name="nikto", action="nikto -host {host} -port {port} -T x46 -timeout 5 -maxtime 1h", valid_services=['http'], ip_range=ip_range)
 				
@@ -70,11 +76,13 @@ class ScanController:
 					for host in fileutil.getSubDirs(fileutil.getPortPath(None,None)):
 						if host in ips:
 							crack_controller.crackDefaults(host)
+
 				elif checkHookScan(scan, "~simple_crack", valid_scans):
 					ips = nmap_parser.parseIpRange(ip_range)
 					for host in fileutil.getSubDirs(fileutil.getPortPath(None,None)):
 						if host in ips:
 							crack_controller.crackSimpleNames(host)
+
 				#confirm valid format and not a comment
 				elif(':' in scan):
 					#run scan
