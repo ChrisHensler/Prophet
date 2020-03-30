@@ -5,18 +5,17 @@ discovery_ping: -sn
 discovery_quick_port: -T4 -Pn -sS --top-ports 10
 
 
-discovery_port_TCP: -sT -T5 --top-ports 5000 
-#discovery_port_UDP: -sU -T4 --top-ports 500 
+discovery_port_TCP: -sT -T5 --top-ports 2000 
+discovery_port_UDP: -sU -T4 --top-ports 100 
+
+detect_version: -sV -T5 --top-ports 1000
+
+service:  -A -sV -sTU -T4 --top-ports 1000  --script=default,smb-enum-shares,http-enum,oracle-sid-brute,realvnc-auth-bypass,smtp-enum-users
 
 
 ~web
 ~snmp
 ~smb
-
-
-service:  -A -sV -sTU -T4 --top-ports 1000  --script=default,banner-plus.nse,smb-enum-shares,http-enum,oracle-sid-brute,realvnc-auth-bypass,smtp-enum-users
-
-
 ~defaults
 
 

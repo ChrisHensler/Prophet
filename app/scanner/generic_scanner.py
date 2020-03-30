@@ -28,6 +28,7 @@ def parseCommand(cmd="", scan_name='Unknown', host='Unknown', port=None, outfile
 
 			return cmd
 
+
 def getFinishedCmd(scan_name='Unknown', host='Unknown', port=None):
 	cmd = "; echo '{2}{0} Scan on {1}".format(scan_name,host, color.important_color)
 	if(not port is None):
@@ -35,9 +36,11 @@ def getFinishedCmd(scan_name='Unknown', host='Unknown', port=None):
 	cmd += " complete{0}';".format(color.neutral)
 	return cmd
 
+
 #internal use, don't bother using
 def _ScanHost(args):
 	ScanHost(args[0],args[1],args[2],args[3],args[4],args[5])
+
 
 def ScanHost(name, host, action, valid_services = [], valid_ports = [], run_once=False):
 	print("starting scan: " + name + " - " + host)
@@ -91,8 +94,6 @@ def ScanHost(name, host, action, valid_services = [], valid_ports = [], run_once
 #not sure how to pickle keywords
 def shell_exec(cmd):
 	subprocess.call(cmd, shell=True)
-
-
 
 
 class GenericScanner:

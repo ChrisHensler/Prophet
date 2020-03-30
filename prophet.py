@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 
 from imports.docopt import docopt, DocoptExit
-import cmd
-import sys
+import cmd, sys, os
 
 import app.scanner.scan_controller as scan_controller
 from app.util import clean,info, workspaces, update, search, progress, knock, system
@@ -255,6 +254,9 @@ class ProphetShell(cmd.Cmd):
 
 
 if __name__ =='__main__':
+	if os.geteuid() != 0:
+		exit('I require root privileges. Take a leap of faith and give all of yourself to me.')
+
 	shell = ProphetShell()
 	shell.bootstrap()
 	shell.cmdloop()
